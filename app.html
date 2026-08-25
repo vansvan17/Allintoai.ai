@@ -152,6 +152,11 @@
   .chatin{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
   .chatin input{flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font-size:13px}
   .chatin button{padding:9px 13px;border:none;border-radius:9px;background:linear-gradient(135deg,#22c9e0,#2f8cff);color:#04202a;font-weight:700;cursor:pointer}
+  /* The homepage embeds a read-only dashboard preview. Keep app-only chrome out of that frame. */
+  body.embedded-preview .site-foot,
+  body.embedded-preview .chatteaser,
+  body.embedded-preview .chatbtn,
+  body.embedded-preview .chatpanel{display:none !important}
   .chip{display:inline-flex;align-items:center;gap:6px;width:max-content;padding:5px 8px;border:1px solid transparent;border-radius:7px;font-size:10px;font-weight:800;letter-spacing:.7px;line-height:1.1}
   .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 7px currentColor}
   .chip.HIGH{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.24);color:var(--high)} .chip.MEDIUM{background:rgba(255,185,81,.12);border-color:rgba(255,185,81,.24);color:var(--med)} .chip.LOW{background:rgba(154,167,182,.12);border-color:rgba(154,167,182,.24);color:var(--low)}
@@ -703,6 +708,7 @@ function _hasView(){ return new URLSearchParams(location.search).get('view'); }
 function _auto(){ const q=new URLSearchParams(location.search); const v=q.get('view'); if(v) showView(v);
   const l=q.get('lead'); if(l){ select(l); if(q.get('log')) openLog(); } if(q.get('upgrade')) openUpgrade(); }
 async function boot(){
+  if(_hasView()) document.body.classList.add('embedded-preview');
   try{ const r=await fetch('api/leads',{cache:'no-store'});
     if(r.ok){ data=await r.json(); _mark('live engine'); renderAll(); if(!_hasView()) showView('dashboard'); _auto(); return; } }catch(e){}
   if(window.__ALLXAI_DATA__){ data=window.__ALLXAI_DATA__; _mark('engine output'); renderAll(); if(!_hasView()) showView('dashboard'); _auto(); return; }

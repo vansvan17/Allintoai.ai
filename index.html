@@ -86,7 +86,9 @@
   .demo-bar em{width:10px;height:10px;border-radius:50%;background:var(--line)}
   .demo-url{margin-left:10px;font-size:11.5px;color:var(--muted)}
   .demo-iframe{display:block;width:100%;height:580px;border:0;background:var(--bg)}
-  @media (max-width:640px){ .demo-iframe{height:540px} }
+  @media (max-width:640px){
+    .demo-iframe{height:540px;pointer-events:none}
+  }
 
   /* sections */
   section.blk{padding:66px 0;border-top:1px solid var(--line)}
@@ -184,7 +186,7 @@
     </div>
     <div class="demo-frame">
       <div class="demo-bar"><em></em><em></em><em></em><span class="demo-url">www.allintoai.ai</span></div>
-      <iframe class="demo-iframe" src="app.html?view=dashboard" title="ALLXAI live dashboard" loading="lazy"></iframe>
+      <iframe class="demo-iframe" src="app.html?view=dashboard" title="ALLXAI live dashboard preview" loading="lazy" scrolling="no" tabindex="-1"></iframe>
     </div>
   </div>
 </div></header>
