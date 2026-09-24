@@ -99,11 +99,6 @@
   .acct-opt{flex:1;padding:9px 10px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-weight:650;font-size:13px;cursor:pointer;font-family:inherit}
   .acct-opt.active{background:linear-gradient(90deg,var(--cyan),var(--cyan2));color:#04202a}
   .login-foot{margin-top:22px;text-align:center;font-size:11.5px;color:var(--muted)}
-  .msg{font-size:13.5px;border-radius:10px;padding:10px 12px;margin:0 0 6px}
-  .msg.err{background:rgba(255,122,122,.08);border:1px solid rgba(255,122,122,.45);color:#ffb3b3}
-  .msg.ok{background:rgba(34,201,224,.08);border:1px solid rgba(34,201,224,.4);color:var(--ink)}
-  .btn[disabled]{opacity:.55;cursor:progress}
-  :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 </style>
 </head>
 <body>
@@ -118,111 +113,32 @@
       <div class="secure"><span class="s">&#128274;</span><div><b>Enterprise-grade security</b><br><span style="font-size:12px">Your data is safe with us</span></div></div>
     </div>
     <div class="right">
-      <h1 id="title">Welcome back</h1>
-      <div class="sub" id="sub">Sign in to your account</div>
-      <div class="acct-toggle" role="radiogroup" aria-label="Account type">
-        <button type="button" class="acct-opt active" data-acct="user" role="radio" aria-checked="true">Users</button>
-        <button type="button" class="acct-opt" data-acct="team" role="radio" aria-checked="false">Team</button>
-        <button type="button" class="acct-opt" data-acct="enterprise" role="radio" aria-checked="false">Enterprise</button>
+      <h1>Welcome back</h1>
+      <div class="sub">Login to your account</div>
+      <div class="acct-toggle" role="tablist" aria-label="Account type">
+        <button type="button" class="acct-opt active" data-acct="business" onclick="setAcct('business')">Business</button>
+        <button type="button" class="acct-opt" data-acct="user" onclick="setAcct('user')">User</button>
       </div>
-      <div id="msg" class="msg" role="status" hidden></div>
-      <form id="authForm" novalidate>
-        <div id="bizWrap" hidden>
-          <label for="biz">Business name</label>
-          <div class="inp"><input id="biz" type="text" maxlength="120" autocomplete="organization" placeholder="Your company" /></div>
-        </div>
-        <label for="email" id="emailLabel">Email address</label>
-        <div class="inp"><input id="email" type="email" autocomplete="email" required placeholder="Enter your email" /></div>
-        <label for="pw">Password</label>
-        <div class="inp"><input id="pw" type="password" autocomplete="current-password" required minlength="8" placeholder="Enter your password" /><button type="button" class="eye" id="eye" aria-label="Show password">&#128065;</button></div>
-        <div class="forgot" id="forgotWrap"><a href="#" id="forgot">Forgot password?</a></div>
-        <button class="btn" id="loginBtn" type="submit">Sign in</button>
-      </form>
-      <div class="signup" id="switchWrap"><span id="switchText">Don't have an account?</span> <a href="#" id="switchLink">Create one</a></div>
-      <div class="demo-note" id="freeLine">New accounts get their first recommendation free.</div>
+      <label id="emailLabel">Work email</label>
+      <div class="inp"><input type="email" placeholder="Enter your email" /></div>
+      <label>Password</label>
+      <div class="inp"><input id="pw" type="password" placeholder="Enter your password" /><button class="eye" onclick="var p=document.getElementById('pw');p.type=p.type==='password'?'text':'password'">&#128065;</button></div>
+      <div class="forgot"><a href="#" onclick="document.getElementById('fpnote').style.display='block';return false">Forgot password?</a></div>
+      <div id="fpnote" style="display:none;font-size:11.5px;color:var(--muted);margin-top:6px;text-align:right">Demonstration only - password reset is not enabled in the MVP.</div>
+      <button class="btn" id="loginBtn" onclick="enterDemo()">Login as Business</button>
+      <div class="or">or continue with</div>
+      <div class="oauth"><button onclick="location.href='app.html'"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.7-3.1-11.3-7.6l-6.5 5C9.6 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.6l6.2 5.2C39.9 36.5 44 31 44 24c0-1.3-.1-2.3-.4-3.5z"/></svg> Google</button><button onclick="location.href='app.html'"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="#F25022" d="M1 1h10v10H1z"/><path fill="#7FBA00" d="M13 1h10v10H13z"/><path fill="#00A4EF" d="M1 13h10v10H1z"/><path fill="#FFB900" d="M13 13h10v10H13z"/></svg> Microsoft</button></div>
+      <div class="signup">Don't have an account? <a href="#" onclick="enterDemo();return false">Sign up</a></div>
+      <div class="demo-note">Preview access - credentials are not required for this MVP.</div>
       <div class="login-foot">&copy; 2026 All Into AI. All rights reserved.</div>
     </div>
   </div>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"></script>
-<script src="beta/config.js"></script>
-<script src="beta/data.js"></script>
 <script>
-(function () {
-  "use strict";
-  var AX = window.AX;
-  var mode = "signin";
-  var acct = "user";
-  var params = new URLSearchParams(location.search);
-  var next = params.get("next") || "businesses.html";
-  if (!/^[a-z0-9_-]+\.html(\?[^#]*)?$/i.test(next)) next = "businesses.html";
-  if (params.get("mode") === "signup") mode = "signup";
-
-  function $(id) { return document.getElementById(id); }
-  function show(text, kind) {
-    var m = $("msg"); m.textContent = text; m.className = "msg " + (kind || "err"); m.hidden = false;
-  }
-  function render() {
-    var up = mode === "signup";
-    var biz = acct !== "user";
-    $("title").textContent = up ? "Create your account" : "Welcome back";
-    $("sub").textContent = up ? "Pick an account type, then add your details" : "Sign in to your account";
-    $("bizWrap").hidden = !(up && biz);
-    $("emailLabel").textContent = biz ? "Work email" : "Email address";
-    $("pw").autocomplete = up ? "new-password" : "current-password";
-    $("forgotWrap").hidden = up;
-    $("loginBtn").textContent = up ? "Create account" : "Sign in";
-    $("switchText").textContent = up ? "Already have an account?" : "Don't have an account?";
-    $("switchLink").textContent = up ? "Sign in" : "Create one";
-  }
-  document.querySelectorAll(".acct-opt").forEach(function (b) {
-    b.addEventListener("click", function () {
-      acct = b.dataset.acct;
-      document.querySelectorAll(".acct-opt").forEach(function (o) {
-        var on = o === b; o.classList.toggle("active", on); o.setAttribute("aria-checked", on ? "true" : "false");
-      });
-      render();
-    });
-  });
-  $("switchLink").addEventListener("click", function (e) {
-    e.preventDefault(); mode = mode === "signup" ? "signin" : "signup"; $("msg").hidden = true; render();
-  });
-  $("eye").addEventListener("click", function () {
-    var p = $("pw"); p.type = p.type === "password" ? "text" : "password";
-  });
-  $("forgot").addEventListener("click", function (e) {
-    e.preventDefault();
-    var email = $("email").value.trim();
-    if (!email) { show("Enter your email above, then select Forgot password again."); return; }
-    AX.resetPassword(email).then(function () {
-      show(AX.live ? "If an account exists for " + email + ", a reset link is on its way." :
-        "Password reset works once the site is connected to Supabase.", "ok");
-    }).catch(function (err) { show(err.message); });
-  });
-  $("authForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var email = $("email").value.trim();
-    var pw = $("pw").value;
-    var biz = $("biz").value.trim();
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { show("Enter a valid email address."); return; }
-    if (pw.length < 8) { show("Use a password with at least 8 characters."); return; }
-    if (mode === "signup" && acct !== "user" && !biz) { show("Add your business name."); return; }
-    var btn = $("loginBtn"); btn.disabled = true;
-    var work = mode === "signup"
-      ? AX.signUp(email, pw, { account_type: acct, business_name: acct === "user" ? null : biz })
-      : AX.signIn(email, pw).then(function () { return { needsConfirm: false }; });
-    work.then(function (res) {
-      if (res.needsConfirm) {
-        btn.disabled = false;
-        mode = "signin"; render();
-        show("Check " + email + " for a confirmation link, then sign in here.", "ok");
-        return;
-      }
-      location.href = next;
-    }).catch(function (err) { btn.disabled = false; show(err.message); });
-  });
-  render();
-  AX.session().then(function (s) { if (s) location.replace(next); });
-})();
+function enterDemo(){ location.href='app.html'; }
+function setAcct(t){ document.querySelectorAll('.acct-opt').forEach(function(b){ b.classList.toggle('active', b.dataset.acct===t); });
+  var biz=t==='business'; var lb=document.getElementById('loginBtn'); if(lb) lb.textContent= biz?'Login as Business':'Login as User';
+  var el=document.getElementById('emailLabel'); if(el) el.textContent= biz?'Work email':'Email address'; }
+document.querySelectorAll('.oauth button').forEach(function(button){ button.onclick=enterDemo; });
 </script>
 </html>
