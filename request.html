@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="assets/favicon.png" />
+<title>ALLXAI - New request</title>
+<link rel="stylesheet" href="beta/beta.css" />
+</head>
+<body>
+<main class="main">
+  <h1>Tell us the problem you want AI to solve</h1>
+  <p class="lead">Describe it in plain words. You'll get the best model for your budget, a model combination, and a rough estimate of what it could save.</p>
+
+  <div id="freeNote" class="note info hidden">Your first recommendation is free.</div>
+  <div id="limitNote" class="note warn hidden">You've used your free recommendation. <a href="plans.html">Pick a plan</a> to keep going. Your earlier results are listed below.</div>
+  <div id="errNote" class="note err hidden" role="alert"></div>
+
+  <form id="form" class="card" novalidate>
+    <div class="field">
+      <label for="problem">What problem are you trying to solve with AI?</label>
+      <textarea id="problem" name="problem" maxlength="2000" required placeholder="e.g. We get hundreds of enquiries a week and can't tell which ones are serious"></textarea>
+      <div class="hint">At least 10 characters. Visible only to your account.</div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" name="category" required></select>
+      </div>
+      <div class="field">
+        <label for="volume">Tasks per month</label>
+        <select id="volume" name="volume" required></select>
+      </div>
+    </div>
+    <div class="field">
+      <span class="label" id="priLabel">Priority</span>
+      <div class="seg" id="priority" role="radiogroup" aria-labelledby="priLabel"></div>
+    </div>
+    <button class="btn" id="submitBtn" type="submit">Get my recommendation</button>
+  </form>
+
+  <div id="historyWrap" class="section hidden">
+    <h3>Your requests</h3>
+    <ul class="history" id="history"></ul>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"></script>
+<script src="beta/config.js"></script>
+<script src="beta/data.js"></script>
+<script src="beta/ui.js"></script>
+<script src="beta/recommender.js"></script>
+<script>
+(function () {
+  "use strict";
+  var R = window.AXRec, AX = window.AX, UI = window.AXUI;
+  var form = document.getElementById("form");
+  var err = document.getElementById("errNote");
+  var btn = document.getElementById("submitBtn");
+  var session;
+
+  function fill(select, table, def) {
+    Object.keys(table).forEach(function (k) {
+      var o = UI.el("option", { value: k }, table[k].label);
+      if (k === def) o.selected = true;
+      select.appendChild(o);
+    });
+  }
+  fill(document.getElementById("category"), R.CATEGORIES, "sales");
+  fill(document.getElementById("volume"), R.VOLUMES, "1k_5k");
+  var seg = document.getElementById("priority");
+  Object.keys(R.PRIORITIES).forEach(function (k) {
+    var input = UI.el("input", { type: "radio", name: "priority", id: "pri-" + k, value: k });
+    if (k === "balanced") input.checked = true;
+    seg.appendChild(input);
+    seg.appendChild(UI.el("label", { "for": "pri-" + k }, R.PRIORITIES[k].label));
+  });
+
+  function showError(msg) { err.textContent = msg; err.classList.remove("hidden"); }
+
+  function lockForm() {
+    document.getElementById("limitNote").classList.remove("hidden");
+    document.getElementById("freeNote").classList.add("hidden");
+    form.classList.add("hidden");
+  }
+
+  function renderHistory(rows) {
+    if (!rows || !rows.length) return;
+    var ul = document.getElementById("history");
+    ul.textContent = "";
+    rows.forEach(function (r) {
+      var a = UI.el("a", { href: "result.html?id=" + encodeURIComponent(r.id) });
+      a.appendChild(UI.el("span", { "class": "p" }, r.problem));
+      a.appendChild(UI.el("span", { "class": "d" }, new Date(r.created_at).toLocaleDateString("en-IN")));
+      var li = UI.el("li");
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+    document.getElementById("historyWrap").classList.remove("hidden");
+  }
+
+  AX.requireSession().then(function (s) {
+    session = s;
+    UI.header(s);
+    return Promise.all([AX.countRequests(), AX.listRequests()]);
+  }).then(function (res) {
+    var count = res[0];
+    if (session.profile.plan === "free") {
+      if (count >= AX.FREE_LIMIT) lockForm();
+      else document.getElementById("freeNote").classList.remove("hidden");
+    }
+    renderHistory(res[1]);
+  }).catch(function (e) { showError("Could not load your account: " + e.message); });
+
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    err.classList.add("hidden");
+    var problem = document.getElementById("problem").value.trim();
+    if (problem.length < 10) { showError("Describe the problem in at least 10 characters."); return; }
+
+    var input = {
+      category: form.category.value,
+      volume: form.volume.value,
+      priority: form.querySelector("input[name=priority]:checked").value,
+      accountType: session.profile.account_type
+    };
+    var result = R.recommend(input);
+
+    btn.disabled = true;
+    btn.textContent = "Finding the best fit...";
+    AX.saveRequest({
+      problem: problem, category: input.category, volume: input.volume,
+      priority: input.priority, result: result
+    }).then(function (id) {
+      location.href = "result.html?id=" + encodeURIComponent(id);
+    }).catch(function (e) {
+      btn.disabled = false;
+      btn.textContent = "Get my recommendation";
+      if (e.message === "FREE_LIMIT") lockForm();
+      else showError("Could not save your request: " + e.message);
+    });
+  });
+})();
+</script>
+</body>
+</html>
